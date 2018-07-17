@@ -12,6 +12,7 @@ namespace NCE.DataBase
         public string LotNumb { get; set; } = "";
         public string HeatNumb { get; set; } = "";
         public string SerialNumb { get; set; } = "";
+        public bool ControlCheckBox { get; set; } = false;
         public int ControlResult { get; set; } = -1;
     }
 }
