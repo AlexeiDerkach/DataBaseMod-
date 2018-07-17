@@ -11,13 +11,13 @@ namespace NCE.DataBase
     public class DataBaseService // : StringBuilderForDB, IDataBaseInterface
     {
         /// <summary> Путь к файлу БД </summary>
-        private static string _filePathDB = string.Format(Application.StartupPath + "\\Data\\" + Const.FileNameDB);
+        private static string filePathDB = string.Format(Application.StartupPath + "\\Data\\" + Const.FileNameDB);
         /// <summary> Путь директории БД </summary>
-        private static string _directoryDB = _filePathDB.Substring(0, _filePathDB.LastIndexOf("\\"));
+        private static string directoryDB = filePathDB.Substring(0, filePathDB.LastIndexOf("\\"));
         /// <summary> Подключение БД </summary>
-        public static SQLiteConnection connectionDB = new SQLiteConnection(string.Format("Data Source={0};Version=3;", _filePathDB));
+        public static SQLiteConnection connectionDB = new SQLiteConnection(string.Format("Data Source={0};Version=3;", filePathDB));
 
-        private TableControl _tableControl = new TableControl();
+        private TableControl tableControl = new TableControl();
 
 
         /// <summary>
@@ -27,11 +27,11 @@ namespace NCE.DataBase
         {
             try
             {
-                if (!Directory.Exists(_directoryDB))
-                    Directory.CreateDirectory(_directoryDB);
+                if (!Directory.Exists(directoryDB))
+                    Directory.CreateDirectory(directoryDB);
 
-                if (!File.Exists(_filePathDB))
-                    SQLiteConnection.CreateFile(_filePathDB);
+                if (!File.Exists(filePathDB))
+                    SQLiteConnection.CreateFile(filePathDB);
 
                 OpenConnection();
                 CreateTableInfo();
@@ -41,7 +41,7 @@ namespace NCE.DataBase
 
             catch (Exception ex)
             {
-                string error = string.Format(ex.Message + "\nCan't create data base directory '{0}'!", _directoryDB);
+                string error = string.Format(ex.Message + "\nCan't create data base directory '{0}'!", directoryDB);
                 MessageBox.Show(error, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
@@ -87,6 +87,7 @@ namespace NCE.DataBase
                 throw;
             }
         }
+
         /// <summary>
         /// Создает таблицу Info
         /// </summary> 
@@ -780,17 +781,21 @@ namespace NCE.DataBase
                 streamDataFile.Read(dataArr, 0, dataArr.Length);
             }
                         
-            _tableControl.DataFile = dataArr;
-            _tableControl.ControlConfig = configArr;
-            _tableControl.TableDefects = pathTableDefects;
-            _tableControl.UsFiles = usFilesArr;
+            tableControl.DataFile = dataArr;
+            tableControl.ControlConfig = configArr;
+            tableControl.TableDefects = pathTableDefects;
+            tableControl.UsFiles = usFilesArr;
 
-            return _tableControl;
+            return tableControl;
         }    
 
+        /// <summary>
+        /// Выгрузка данных из таблицы Info для DataGridView
+        /// </summary>
+        /// <returns>Список строк в БД</returns>
         public List<TableInfo> SelectAllFromTableInfo()
         {
-            List<TableInfo> _list = new List<TableInfo>();
+            List<TableInfo> list = new List<TableInfo>();
             try
             {
                 OpenConnection();
@@ -858,11 +863,11 @@ namespace NCE.DataBase
                                 item.UsFilesPath = reader.GetString(52);
                                 item.ControlResult = reader.GetByte(53);
                                 item.DateTimeStump = reader.GetDateTime(54);
-                                _list.Add(item);
+                                list.Add(item);
                             };
                     }
                 }
-                return _list;
+                return list;
             }
             catch (Exception)
             {
@@ -874,6 +879,12 @@ namespace NCE.DataBase
             }
         }
 
+        /// <summary>
+        /// Выгружает файлы контроля и конфига по заданому ID
+        /// </summary>
+        /// <param name="id">ID записи в БД</param>
+        /// <param name="streamDataControl">MemoryStream Контроля</param>
+        /// <param name="streamDataConfig">MemoryStream Конфигурации</param>
         public void SelectSingleId(long id, out MemoryStream streamDataControl, out MemoryStream streamDataConfig)
         {
             byte[] _dataControlArray;
@@ -911,6 +922,10 @@ namespace NCE.DataBase
             }
         }
 
+        /// <summary>
+        /// Удаляет строку в БД
+        /// </summary>
+        /// <param name="id">ID строки</param>
         public void DeletSelectedRow(int id)
         {
             try
@@ -919,10 +934,7 @@ namespace NCE.DataBase
                 using (SQLiteConnection sqlConn = new SQLiteConnection(connectionDB))
                 using (SQLiteCommand cmd = new SQLiteCommand(sqlConn))
                 {
-                    cmd.CommandText = ($"DELETE FROM info, control WHERE ID={id};");
-                    {
-                        
-                    }
+                    cmd.CommandText = ($"DELETE FROM info, control WHERE ID={id};");                    
                 }
             }
 
@@ -941,7 +953,8 @@ namespace NCE.DataBase
         /// <summary>
         /// Возвращает временной штамп первой и последней записи
         /// </summary>
-        /// <returns></returns>
+        /// <param name="firstRowDT">DateTime первой записи</param>
+        /// <param name="lastRowDT">DateTime последней записи</param>
         public void SelectDatePeriod(out DateTime firstRowDT, out DateTime lastRowDT)
         {            
             try
@@ -1006,6 +1019,19 @@ namespace NCE.DataBase
             {
                 CloseConnection();
             }            
+        }
+        
+        /// <summary>
+        /// Возвращает дату создания, модификации и размер файла БД
+        /// </summary>
+        /// <param name="creation">Дата создания</param>
+        /// <param name="modification">Дата модификации</param>
+        /// <param name="size">Размер файла в байтах</param>
+        public void GetFileDBInfo(out DateTime creation, out DateTime modification, out long size)
+        {
+            creation = File.GetCreationTime(filePathDB);
+            modification = File.GetLastWriteTime(filePathDB);
+            size = new FileInfo(filePathDB).Length;
         }
     }
 }
