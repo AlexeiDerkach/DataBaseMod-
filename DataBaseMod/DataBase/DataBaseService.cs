@@ -210,18 +210,19 @@ namespace NCE.DataBase
         /// <param name="id"></param>
         private void DeleteRowFromInfo(long id)
         {
-            try
-            {                
-                using (SQLiteConnection sqlConn = new SQLiteConnection(connectionDB))
-                using (SQLiteCommand cmd = new SQLiteCommand(sqlConn))
-                {
-                    cmd.CommandText = ($"DELETE FROM info WHERE ID={id};");
-                }
-            }
-
-            catch (Exception)
+            using (SQLiteCommand commandDB = new SQLiteCommand(connectionDB))
             {
-                throw;
+                commandDB.CommandText = ($"DELETE FROM info WHERE ID={id};");
+
+                try
+                {
+                    commandDB.CommandType = CommandType.Text;
+                    commandDB.ExecuteNonQuery();
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
             }
         }
 
@@ -231,19 +232,20 @@ namespace NCE.DataBase
         /// <param name="id"></param>
         private void DeleteRowFromControl(long id)
         {
-            try
+            using (SQLiteCommand commandDB = new SQLiteCommand(connectionDB))
             {
-                using (SQLiteConnection sqlConn = new SQLiteConnection(connectionDB))
-                using (SQLiteCommand cmd = new SQLiteCommand(sqlConn))
-                {
-                    cmd.CommandText = ($"DELETE FROM control WHERE ID={id};");
-                }
-            }
+                commandDB.CommandText = ($"DELETE FROM control WHERE ID={id};");
 
-            catch (Exception)
-            {
-                throw;
-            }
+                try
+                {
+                    commandDB.CommandType = CommandType.Text;
+                    commandDB.ExecuteNonQuery();
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }            
         }
         
         /// <summary>
