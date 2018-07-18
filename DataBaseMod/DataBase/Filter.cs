@@ -13,6 +13,6 @@ namespace NCE.DataBase
         public string HeatNumb { get; set; } = "";
         public string SerialNumb { get; set; } = "";
         public bool ControlCheckBox { get; set; } = false;
-        public int ControlResult { get; set; } = -1;
+        public int ControlResult { get; set; } = 0;
     }
 }

@@ -8,17 +8,19 @@ using System.Data.SQLite;
 
 namespace NCE.DataBase
 {
-    public class DataBaseService // : StringBuilderForDB, IDataBaseInterface
+    public class DataBaseService
     {
+        #region Поля
+
         /// <summary> Путь к файлу БД </summary>
         private static string filePathDB = string.Format(Application.StartupPath + "\\Data\\" + Const.FileNameDB);
         /// <summary> Путь директории БД </summary>
         private static string directoryDB = filePathDB.Substring(0, filePathDB.LastIndexOf("\\"));
         /// <summary> Подключение БД </summary>
-        public static SQLiteConnection connectionDB = new SQLiteConnection(string.Format("Data Source={0};Version=3;", filePathDB));
-
+        private static SQLiteConnection connectionDB = new SQLiteConnection(string.Format("Data Source={0};Version=3;", filePathDB));
         private TableControl tableControl = new TableControl();
 
+        #endregion
 
         /// <summary>
         /// Создание новой БД
@@ -199,6 +201,48 @@ namespace NCE.DataBase
                         return false;
                         throw;
                     }
+            }
+        }
+
+        /// <summary>
+        /// DELETE из таблицы Info
+        /// </summary>
+        /// <param name="id"></param>
+        private void DeleteRowFromInfo(long id)
+        {
+            try
+            {                
+                using (SQLiteConnection sqlConn = new SQLiteConnection(connectionDB))
+                using (SQLiteCommand cmd = new SQLiteCommand(sqlConn))
+                {
+                    cmd.CommandText = ($"DELETE FROM info WHERE ID={id};");
+                }
+            }
+
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// DELETE из таблицы Control
+        /// </summary>
+        /// <param name="id"></param>
+        private void DeleteRowFromControl(long id)
+        {
+            try
+            {
+                using (SQLiteConnection sqlConn = new SQLiteConnection(connectionDB))
+                using (SQLiteCommand cmd = new SQLiteCommand(sqlConn))
+                {
+                    cmd.CommandText = ($"DELETE FROM control WHERE ID={id};");
+                }
+            }
+
+            catch (Exception)
+            {
+                throw;
             }
         }
         
@@ -721,11 +765,11 @@ namespace NCE.DataBase
         }
         
         /// <summary>
-        /// Совершает SQL-транзакцию для двух таблиц
+        /// INSERT-транзакция для двух таблиц
         /// </summary>
         /// <param name="info">Экземпляр TableInfo</param>
         /// <param name="control">Экземпляр TableControl</param>
-        public bool ExecuteSqlTransaction(TableInfo info, TableControl control)
+        public bool InsertTransaction(TableInfo info, TableControl control)
         {
             using (SQLiteCommand commandDB = new SQLiteCommand(connectionDB))
             {                
@@ -747,6 +791,42 @@ namespace NCE.DataBase
                 catch (Exception ex)
                 {
                     transaction.Rollback();                    
+                    return false;
+                    throw new Exception(ex.Message);
+                }
+                finally
+                {
+                    CloseConnection();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Удаляет строку в БД
+        /// </summary>
+        /// <param name="id">ID строки</param>
+        public bool DeleteTransaction(long id)
+        {
+            using (SQLiteCommand commandDB = new SQLiteCommand(connectionDB))
+            {
+                SQLiteTransaction transaction;
+
+                OpenConnection();
+
+                transaction = connectionDB.BeginTransaction();
+                commandDB.Connection = connectionDB;
+                commandDB.Transaction = transaction;
+
+                try
+                {
+                    DeleteRowFromInfo(id);
+                    DeleteRowFromControl(id);
+                    transaction.Commit();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
                     return false;
                     throw new Exception(ex.Message);
                 }
@@ -920,35 +1000,7 @@ namespace NCE.DataBase
             {
                 CloseConnection();
             }
-        }
-
-        /// <summary>
-        /// Удаляет строку в БД
-        /// </summary>
-        /// <param name="id">ID строки</param>
-        public void DeletSelectedRow(int id)
-        {
-            try
-            {
-                OpenConnection();
-                using (SQLiteConnection sqlConn = new SQLiteConnection(connectionDB))
-                using (SQLiteCommand cmd = new SQLiteCommand(sqlConn))
-                {
-                    cmd.CommandText = ($"DELETE FROM info, control WHERE ID={id};");                    
-                }
-            }
-
-            catch (Exception)
-            {
-                throw;
-            }
-
-            finally
-            {
-                CloseConnection();
-            }
-
-        }
+        }        
 
         /// <summary>
         /// Возвращает временной штамп первой и последней записи

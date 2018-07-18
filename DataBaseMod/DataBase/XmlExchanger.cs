@@ -8,14 +8,17 @@ namespace NCE.DataBase
 {
     public class XmlExchanger
     {
+        #region Поля
+
         /// <summary> Путь к файлу lot </summary>
         public static string lot = string.Format(Application.StartupPath + "\\" + Const.LotDataFile);
         /// <summary> Путь к директории </summary>
-        public static string directoryLotData = lot.Substring(0, lot.LastIndexOf("\\"));       
+        public static string directoryLotData = lot.Substring(0, lot.LastIndexOf("\\"));
+        private XmlDocument doc = new XmlDocument();
+        private XmlElement root;
+        private TableInfo instTI = new TableInfo();
 
-        private XmlDocument _doc = new XmlDocument();
-        private XmlElement _root;
-        private TableInfo _instTI = new TableInfo();
+        #endregion
 
         /// <summary> Создаёт dafault XML-файл данных FormLot </summary>
         public void CreateDefaultXml()
@@ -82,68 +85,74 @@ namespace NCE.DataBase
             }
         }
 
-        /// <summary> Возвращает объект считанный из XML-файла данных FormLot</summary>
+        /// <summary>
+        /// Чтение XML-файла
+        /// </summary>
+        /// <returns>Возвращает объект считанный из XML-файла данных FormLot</returns>
         public TableInfo ReadXml()
         {
-            _doc.Load(lot);
-            _root = _doc.DocumentElement;
+            doc.Load(lot);
+            root = doc.DocumentElement;
 
-            _instTI.Fio = _root.GetElementsByTagName("FIO")[0].InnerText;
-            _instTI.TabelNumb = _root.GetElementsByTagName("TabelNumb")[0].InnerText;
-            _instTI.Shift = _root.GetElementsByTagName("Shift")[0].InnerText;
-            _instTI.NormDoc = _root.GetElementsByTagName("NormDoc")[0].InnerText;
-            _instTI.Specification = _root.GetElementsByTagName("Specification")[0].InnerText;
-            _instTI.Drawing = _root.GetElementsByTagName("Drawing")[0].InnerText;
-            _instTI.SteelType = _root.GetElementsByTagName("SteelType")[0].InnerText;
-            _instTI.SopNumb = _root.GetElementsByTagName("SopNumb")[0].InnerText;
-            _instTI.Lot = _root.GetElementsByTagName("Lot")[0].InnerText;
-            _instTI.LotNumb = _root.GetElementsByTagName("LotNumb")[0].InnerText;
-            _instTI.HeatNumb = _root.GetElementsByTagName("HeatNumb")[0].InnerText;
-            _instTI.BundleNumb = _root.GetElementsByTagName("BundleNumb")[0].InnerText;            
-            _instTI.SerialNumb = _root.GetElementsByTagName("SerialNumb")[0].InnerText;
-            _instTI.AddNumb1 = _root.GetElementsByTagName("AddNumb1")[0].InnerText;
-            _instTI.AddNumb2 = _root.GetElementsByTagName("AddNumb2")[0].InnerText;
-            _instTI.AddNumb3 = _root.GetElementsByTagName("AddNumb3")[0].InnerText;
-            _instTI.AddNumb4 = _root.GetElementsByTagName("AddNumb4")[0].InnerText;
-            _instTI.AddNumb5 = _root.GetElementsByTagName("AddNumb5")[0].InnerText;
-            _instTI.ObjectLength = Convert.ToDouble(_root.GetElementsByTagName("ObjectLength")[0].InnerText);
-            _instTI.ObjectWidth = Convert.ToDouble(_root.GetElementsByTagName("ObjectWidth")[0].InnerText);
-            _instTI.ObjectHeight = Convert.ToDouble(_root.GetElementsByTagName("ObjectHeight")[0].InnerText);
-            _instTI.ObjectSpeed = Convert.ToDouble(_root.GetElementsByTagName("ObjectSpeed")[0].InnerText);
-            _instTI.ObjectOuterDiameter = Convert.ToDouble(_root.GetElementsByTagName("ObjectOuterDiameter")[0].InnerText);
-            _instTI.ObjectInnerDiameter = Convert.ToDouble(_root.GetElementsByTagName("ObjectInnerDiameter")[0].InnerText);
-            _instTI.ObjectWallThickness = Convert.ToDouble(_root.GetElementsByTagName("ObjectWallThickness")[0].InnerText);
-            _instTI.ObjectA = Convert.ToDouble(_root.GetElementsByTagName("ObjectA")[0].InnerText);
-            _instTI.ObjectB = Convert.ToDouble(_root.GetElementsByTagName("ObjectB")[0].InnerText);
-            _instTI.ObjectC = Convert.ToDouble(_root.GetElementsByTagName("ObjectC")[0].InnerText);
-            _instTI.ObjectD = Convert.ToDouble(_root.GetElementsByTagName("ObjectD")[0].InnerText);
-            _instTI.ObjectE = Convert.ToDouble(_root.GetElementsByTagName("ObjectE")[0].InnerText);
-            _instTI.ObjectF = Convert.ToDouble(_root.GetElementsByTagName("ObjectF")[0].InnerText);
-            _instTI.ObjectG = Convert.ToDouble(_root.GetElementsByTagName("ObjectG")[0].InnerText);
-            _instTI.ObjectH = Convert.ToDouble(_root.GetElementsByTagName("ObjectH")[0].InnerText);
-            _instTI.ObjectI = Convert.ToDouble(_root.GetElementsByTagName("ObjectI")[0].InnerText);
-            _instTI.ObjectJ = Convert.ToDouble(_root.GetElementsByTagName("ObjectJ")[0].InnerText);
-            _instTI.ObjectK = Convert.ToDouble(_root.GetElementsByTagName("ObjectK")[0].InnerText);
-            _instTI.ObjectL = Convert.ToDouble(_root.GetElementsByTagName("ObjectL")[0].InnerText);
-            _instTI.ObjectM = Convert.ToDouble(_root.GetElementsByTagName("ObjectM")[0].InnerText);
-            _instTI.ObjectN = Convert.ToDouble(_root.GetElementsByTagName("ObjectN")[0].InnerText);
-            _instTI.ObjectO = Convert.ToDouble(_root.GetElementsByTagName("ObjectO")[0].InnerText);
-            _instTI.ObjectP = Convert.ToDouble(_root.GetElementsByTagName("ObjectP")[0].InnerText);
-            _instTI.ObjectQ = Convert.ToDouble(_root.GetElementsByTagName("ObjectQ")[0].InnerText);
-            _instTI.ObjectR = Convert.ToDouble(_root.GetElementsByTagName("ObjectR")[0].InnerText);
-            _instTI.ObjectS = Convert.ToDouble(_root.GetElementsByTagName("ObjectS")[0].InnerText);
-            _instTI.ObjectT = Convert.ToDouble(_root.GetElementsByTagName("ObjectT")[0].InnerText);
-            _instTI.ObjectU = Convert.ToDouble(_root.GetElementsByTagName("ObjectU")[0].InnerText);
-            _instTI.ObjectV = Convert.ToDouble(_root.GetElementsByTagName("ObjectV")[0].InnerText);
-            _instTI.ObjectW = Convert.ToDouble(_root.GetElementsByTagName("ObjectW")[0].InnerText);
-            _instTI.ObjectX = Convert.ToDouble(_root.GetElementsByTagName("ObjectX")[0].InnerText);
-            _instTI.ObjectY = Convert.ToDouble(_root.GetElementsByTagName("ObjectY")[0].InnerText);
-            _instTI.ObjectZ = Convert.ToDouble(_root.GetElementsByTagName("ObjectZ")[0].InnerText);
+            instTI.Fio = root.GetElementsByTagName("FIO")[0].InnerText;
+            instTI.TabelNumb = root.GetElementsByTagName("TabelNumb")[0].InnerText;
+            instTI.Shift = root.GetElementsByTagName("Shift")[0].InnerText;
+            instTI.NormDoc = root.GetElementsByTagName("NormDoc")[0].InnerText;
+            instTI.Specification = root.GetElementsByTagName("Specification")[0].InnerText;
+            instTI.Drawing = root.GetElementsByTagName("Drawing")[0].InnerText;
+            instTI.SteelType = root.GetElementsByTagName("SteelType")[0].InnerText;
+            instTI.SopNumb = root.GetElementsByTagName("SopNumb")[0].InnerText;
+            instTI.Lot = root.GetElementsByTagName("Lot")[0].InnerText;
+            instTI.LotNumb = root.GetElementsByTagName("LotNumb")[0].InnerText;
+            instTI.HeatNumb = root.GetElementsByTagName("HeatNumb")[0].InnerText;
+            instTI.BundleNumb = root.GetElementsByTagName("BundleNumb")[0].InnerText;            
+            instTI.SerialNumb = root.GetElementsByTagName("SerialNumb")[0].InnerText;
+            instTI.AddNumb1 = root.GetElementsByTagName("AddNumb1")[0].InnerText;
+            instTI.AddNumb2 = root.GetElementsByTagName("AddNumb2")[0].InnerText;
+            instTI.AddNumb3 = root.GetElementsByTagName("AddNumb3")[0].InnerText;
+            instTI.AddNumb4 = root.GetElementsByTagName("AddNumb4")[0].InnerText;
+            instTI.AddNumb5 = root.GetElementsByTagName("AddNumb5")[0].InnerText;
+            instTI.ObjectLength = Convert.ToDouble(root.GetElementsByTagName("ObjectLength")[0].InnerText);
+            instTI.ObjectWidth = Convert.ToDouble(root.GetElementsByTagName("ObjectWidth")[0].InnerText);
+            instTI.ObjectHeight = Convert.ToDouble(root.GetElementsByTagName("ObjectHeight")[0].InnerText);
+            instTI.ObjectSpeed = Convert.ToDouble(root.GetElementsByTagName("ObjectSpeed")[0].InnerText);
+            instTI.ObjectOuterDiameter = Convert.ToDouble(root.GetElementsByTagName("ObjectOuterDiameter")[0].InnerText);
+            instTI.ObjectInnerDiameter = Convert.ToDouble(root.GetElementsByTagName("ObjectInnerDiameter")[0].InnerText);
+            instTI.ObjectWallThickness = Convert.ToDouble(root.GetElementsByTagName("ObjectWallThickness")[0].InnerText);
+            instTI.ObjectA = Convert.ToDouble(root.GetElementsByTagName("ObjectA")[0].InnerText);
+            instTI.ObjectB = Convert.ToDouble(root.GetElementsByTagName("ObjectB")[0].InnerText);
+            instTI.ObjectC = Convert.ToDouble(root.GetElementsByTagName("ObjectC")[0].InnerText);
+            instTI.ObjectD = Convert.ToDouble(root.GetElementsByTagName("ObjectD")[0].InnerText);
+            instTI.ObjectE = Convert.ToDouble(root.GetElementsByTagName("ObjectE")[0].InnerText);
+            instTI.ObjectF = Convert.ToDouble(root.GetElementsByTagName("ObjectF")[0].InnerText);
+            instTI.ObjectG = Convert.ToDouble(root.GetElementsByTagName("ObjectG")[0].InnerText);
+            instTI.ObjectH = Convert.ToDouble(root.GetElementsByTagName("ObjectH")[0].InnerText);
+            instTI.ObjectI = Convert.ToDouble(root.GetElementsByTagName("ObjectI")[0].InnerText);
+            instTI.ObjectJ = Convert.ToDouble(root.GetElementsByTagName("ObjectJ")[0].InnerText);
+            instTI.ObjectK = Convert.ToDouble(root.GetElementsByTagName("ObjectK")[0].InnerText);
+            instTI.ObjectL = Convert.ToDouble(root.GetElementsByTagName("ObjectL")[0].InnerText);
+            instTI.ObjectM = Convert.ToDouble(root.GetElementsByTagName("ObjectM")[0].InnerText);
+            instTI.ObjectN = Convert.ToDouble(root.GetElementsByTagName("ObjectN")[0].InnerText);
+            instTI.ObjectO = Convert.ToDouble(root.GetElementsByTagName("ObjectO")[0].InnerText);
+            instTI.ObjectP = Convert.ToDouble(root.GetElementsByTagName("ObjectP")[0].InnerText);
+            instTI.ObjectQ = Convert.ToDouble(root.GetElementsByTagName("ObjectQ")[0].InnerText);
+            instTI.ObjectR = Convert.ToDouble(root.GetElementsByTagName("ObjectR")[0].InnerText);
+            instTI.ObjectS = Convert.ToDouble(root.GetElementsByTagName("ObjectS")[0].InnerText);
+            instTI.ObjectT = Convert.ToDouble(root.GetElementsByTagName("ObjectT")[0].InnerText);
+            instTI.ObjectU = Convert.ToDouble(root.GetElementsByTagName("ObjectU")[0].InnerText);
+            instTI.ObjectV = Convert.ToDouble(root.GetElementsByTagName("ObjectV")[0].InnerText);
+            instTI.ObjectW = Convert.ToDouble(root.GetElementsByTagName("ObjectW")[0].InnerText);
+            instTI.ObjectX = Convert.ToDouble(root.GetElementsByTagName("ObjectX")[0].InnerText);
+            instTI.ObjectY = Convert.ToDouble(root.GetElementsByTagName("ObjectY")[0].InnerText);
+            instTI.ObjectZ = Convert.ToDouble(root.GetElementsByTagName("ObjectZ")[0].InnerText);
 
-            return _instTI;
+            return instTI;
         }
 
-        /// <summary> Заполняет XML-файл данных FormLot </summary>
+        /// <summary>
+        /// Заполняет XML-файл данных FormLot
+        /// </summary>
+        /// <param name="tableInfo">Таблица Info</param>
         public void FillXml(TableInfo tableInfo)
         {
             XElement doc = new XElement("LotData",

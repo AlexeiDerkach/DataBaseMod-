@@ -5,7 +5,9 @@ namespace NCE.DataBase
 {
     public class TableInfo : INotifyPropertyChanged
     {
+        /// <summary> Норма </summary>
         public const byte Accepted = 0;
+        /// <summary> Брак </summary>
         public const byte Rejected = 1;
 
         private long id;
