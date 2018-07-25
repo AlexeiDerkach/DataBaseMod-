@@ -4,6 +4,8 @@ using System.Data;
 using System.IO;
 using System.Windows.Forms;
 using System.Data.SQLite;
+using System.Drawing;
+using Ionic.Zip;
 
 
 namespace NCE.DataBase
@@ -13,14 +15,28 @@ namespace NCE.DataBase
         #region Поля
 
         /// <summary> Путь к файлу БД </summary>
-        private static string filePathDB = string.Format(Application.StartupPath + "\\Data\\" + Const.FileNameDB);
+        private static string filePathDB = string.Format(Application.StartupPath + "\\Data\\" + Const.FileNameDB);        
+        /// <summary> Путь к архивам БД </summary>
+        private static string archiveDir = string.Format(Application.StartupPath + "\\Archive\\");
         /// <summary> Путь директории БД </summary>
-        private static string directoryDB = filePathDB.Substring(0, filePathDB.LastIndexOf("\\"));
+        private static string dataBaseDir = filePathDB.Substring(0, filePathDB.LastIndexOf("\\"));
         /// <summary> Подключение БД </summary>
         private static SQLiteConnection connectionDB = new SQLiteConnection(string.Format("Data Source={0};Version=3;", filePathDB));
+        
         private TableControl tableControl = new TableControl();
+        private ProgressBar progressBar = new ProgressBar();
 
         #endregion
+
+        public DataBaseService()
+        {
+            
+        }
+
+        public DataBaseService(ProgressBar progressBar)
+        {
+            this.progressBar = progressBar;
+        }
 
         /// <summary>
         /// Создание новой БД
@@ -29,21 +45,23 @@ namespace NCE.DataBase
         {
             try
             {
-                if (!Directory.Exists(directoryDB))
-                    Directory.CreateDirectory(directoryDB);
+                if (!Directory.Exists(dataBaseDir))
+                    Directory.CreateDirectory(dataBaseDir);
 
                 if (!File.Exists(filePathDB))
+                {
                     SQLiteConnection.CreateFile(filePathDB);
-
-                OpenConnection();
-                CreateTableInfo();
-                CreateTableControl();                
+                    OpenConnection();
+                    CreateTableInfo();
+                    CreateTableControl();
+                }
+                                
                 return true;
             }
 
             catch (Exception ex)
             {
-                string error = string.Format(ex.Message + "\nCan't create data base directory '{0}'!", directoryDB);
+                string error = string.Format(ex.Message + "\nCan't create data base directory '{0}'!", dataBaseDir);
                 MessageBox.Show(error, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
@@ -51,6 +69,24 @@ namespace NCE.DataBase
             finally
             {
                 CloseConnection();
+            }
+        }
+
+        /// <summary>
+        /// Создание директории для Архива
+        /// </summary>   
+        private bool CreateArchiveDir()
+        {
+            try
+            {
+                if (!Directory.Exists(archiveDir))
+                    Directory.CreateDirectory(archiveDir);               
+                return true;
+            }
+
+            catch (Exception)
+            {                
+                return false;
             }
         }
 
@@ -1076,16 +1112,82 @@ namespace NCE.DataBase
         }
         
         /// <summary>
-        /// Возвращает дату создания, модификации и размер файла БД
+        /// Возвращает дату создания и модификации файла БД
         /// </summary>
         /// <param name="creation">Дата создания</param>
         /// <param name="modification">Дата модификации</param>
-        /// <param name="size">Размер файла в байтах</param>
-        public void GetFileDBInfo(out DateTime creation, out DateTime modification, out long size)
+        public void GetDataBaseFileInfo(out DateTime creation, out DateTime modification)
         {
             creation = File.GetCreationTime(filePathDB);
-            modification = File.GetLastWriteTime(filePathDB);
-            size = new FileInfo(filePathDB).Length;
+            modification = File.GetLastWriteTime(filePathDB);            
         }
+
+        public long GetDataBaseFileSize()
+        {
+            long size;
+            return size = new FileInfo(filePathDB).Length;
+        }
+
+        public void DataBaseSizeСheck(out string fileSize, out Color sizeColor)
+        {
+            long size = GetDataBaseFileSize();
+            string[] suffix = { "B", "KB", "MB", "GB", "TB" };
+
+            int i;
+            double dBytes = size;
+            for (i = 0; i < suffix.Length && size >= 1024; i++, size /= 1024)
+            {
+                dBytes = size / 1024.0;
+            }
+
+            fileSize = String.Format("{0:0.#} {1}", dBytes, suffix[i]);
+
+            if (dBytes >= 2.1 && suffix[i] == "GB") sizeColor = Color.DarkRed;
+            else sizeColor = Color.Black;
+        }
+
+        public bool DataBaseSizeСheck()
+        {
+            long size = GetDataBaseFileSize();
+            double gb = (double)size / (1024 * 1024 * 1024);
+            if (gb >= 0.1) return true;
+            else return false;
+        }
+
+        public bool ZipDataBase()
+        {
+            CreateArchiveDir();
+            SelectDatePeriod(out DateTime firstRow, out DateTime secondRow);
+            string created = String.Format("{0:dd.MM.yyyy}", firstRow);
+            string modified = String.Format("{0:dd.MM.yyyy}", secondRow);
+            string archiveFileName = archiveDir + "UTDB" + " " + created + " - " + modified + ".zip";
+            try
+            {
+                using (ZipFile zip = new ZipFile())
+                {                    
+                    zip.AddFile(filePathDB, "");
+                    zip.SaveProgress += ZipProgress;
+                    zip.Save(archiveFileName);
+                    return true;
+                }                          
+            }
+            catch (Exception)
+            {
+                return false;                
+            }            
+        }
+
+        private void ZipProgress(object sender, SaveProgressEventArgs e)
+        {
+            if(e.EventType == ZipProgressEventType.Saving_EntryBytesRead)
+            {
+                progressBar.Invoke(new MethodInvoker(delegate
+                {
+                    progressBar.Maximum = 100;                    
+                    progressBar.Value = (int)((e.BytesTransferred * 100) / (e.TotalBytesToTransfer));                    
+                }
+                ));
+            }
+        } 
     }
 }
