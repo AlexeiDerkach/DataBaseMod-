@@ -839,6 +839,10 @@ namespace NCE.DataBase
             }
         }
 
+        /// <summary>
+        /// Удаляет файл БД
+        /// </summary>
+        /// <returns></returns>
         public bool DeleteDateBaseFile()
         {
             try
@@ -847,6 +851,33 @@ namespace NCE.DataBase
                 return true;
             }
             catch { return false; }
+        }
+
+        /// <summary>
+        /// Проверяет налиичие записей в таблице Info
+        /// </summary>
+        /// <returns>true если таблица пустая</returns>
+        public bool CheckIsTableEmpty()
+        {
+            try
+            {
+                OpenConnection();
+                using (SQLiteConnection sqlConn = new SQLiteConnection(connectionDB))
+                using (SQLiteCommand cmd = new SQLiteCommand(sqlConn))
+                {
+                    cmd.CommandText = ("SELECT COUNT(*) FROM info");
+                    int result = int.Parse(cmd.ExecuteScalar().ToString());
+
+                    if (result == 0)
+                        return true;
+                    else
+                        return false;
+                }
+            }
+            finally
+            {
+                CloseConnection();
+            }
         }
 
         /// <summary>
@@ -1130,14 +1161,14 @@ namespace NCE.DataBase
         {
             creation = File.GetCreationTime(filePathDB);
             modification = File.GetLastWriteTime(filePathDB);            
-        }
+        }        
 
-        private long GetDataBaseFileSize()
-        {
-            long size;
-            return size = new FileInfo(filePathDB).Length;
-        }
-
+        /// <summary>
+        /// Проверяет размер файла БД
+        /// </summary>
+        /// <param name="critSize">Допустимый размер БД</param>
+        /// <param name="fileSize">Фактический размер БД, в строковом значении</param>
+        /// <param name="sizeColor">Цвет по превышению допустимого размера становится красным</param>
         public void СheckDataBaseSize(double critSize, out string fileSize, out Color sizeColor)
         {
             long size = GetDataBaseFileSize();
@@ -1156,6 +1187,11 @@ namespace NCE.DataBase
             else sizeColor = Color.Black;
         }
 
+        /// <summary>
+        /// Проверяет размер файла БД
+        /// </summary>
+        /// <param name="critSize">Допустимый размер БД</param>
+        /// <returns>Лимит достигнут true</returns>
         public bool СheckDataBaseSize(double critSize)
         {
             long size = GetDataBaseFileSize();
@@ -1164,6 +1200,10 @@ namespace NCE.DataBase
             else return false;
         }
 
+        /// <summary>
+        /// Архивация файла БД
+        /// </summary>
+        /// <returns>Успех операции</returns>
         public bool ZipDataBase()
         {
             CreateArchiveDir();
@@ -1198,29 +1238,13 @@ namespace NCE.DataBase
                 }
                 ));
             }
-        } 
-        
-        public bool CheckIsTableEmpty()
-        {
-            try
-            {
-                OpenConnection();
-                using (SQLiteConnection sqlConn = new SQLiteConnection(connectionDB))
-                using (SQLiteCommand cmd = new SQLiteCommand(sqlConn))
-                {
-                    cmd.CommandText = ("SELECT COUNT(*) FROM info");
-                    int result = int.Parse(cmd.ExecuteScalar().ToString());
-
-                    if (result == 0)
-                        return true;
-                    else
-                        return false;
-                }
-            }
-            finally
-            {
-                CloseConnection();
-            }
         }
+
+        private long GetDataBaseFileSize()
+        {
+            long size;
+            return size = new FileInfo(filePathDB).Length;
+        }
+
     }
 }
