@@ -839,6 +839,16 @@ namespace NCE.DataBase
             }
         }
 
+        public bool DeleteDateBaseFile()
+        {
+            try
+            {
+                File.Delete(filePathDB);
+                return true;
+            }
+            catch { return false; }
+        }
+
         /// <summary>
         /// Удаляет строку в БД
         /// </summary>
@@ -1122,13 +1132,13 @@ namespace NCE.DataBase
             modification = File.GetLastWriteTime(filePathDB);            
         }
 
-        public long GetDataBaseFileSize()
+        private long GetDataBaseFileSize()
         {
             long size;
             return size = new FileInfo(filePathDB).Length;
         }
 
-        public void DataBaseSizeСheck(out string fileSize, out Color sizeColor)
+        public void DataBaseSizeСheck(double critSize, out string fileSize, out Color sizeColor)
         {
             long size = GetDataBaseFileSize();
             string[] suffix = { "B", "KB", "MB", "GB", "TB" };
@@ -1142,15 +1152,15 @@ namespace NCE.DataBase
 
             fileSize = String.Format("{0:0.#} {1}", dBytes, suffix[i]);
 
-            if (dBytes >= 2.1 && suffix[i] == "GB") sizeColor = Color.DarkRed;
+            if (dBytes >= critSize && suffix[i] == "GB") sizeColor = Color.DarkRed;
             else sizeColor = Color.Black;
         }
 
-        public bool DataBaseSizeСheck()
+        public bool DataBaseSizeСheck(double critSize)
         {
             long size = GetDataBaseFileSize();
             double gb = (double)size / (1024 * 1024 * 1024);
-            if (gb >= 0.1) return true;
+            if (gb >= critSize) return true;
             else return false;
         }
 
@@ -1189,5 +1199,28 @@ namespace NCE.DataBase
                 ));
             }
         } 
+        
+        public bool CheckEmptyTables()
+        {
+            try
+            {
+                OpenConnection();
+                using (SQLiteConnection sqlConn = new SQLiteConnection(connectionDB))
+                using (SQLiteCommand cmd = new SQLiteCommand(sqlConn))
+                {
+                    cmd.CommandText = ("SELECT COUNT(*) from data");
+                    int result = int.Parse(cmd.ExecuteScalar().ToString());
+
+                    if (result == 0)
+                        return true;
+                    else
+                        return false;
+                }
+            }
+            finally
+            {
+                CloseConnection();
+            }
+        }
     }
 }
