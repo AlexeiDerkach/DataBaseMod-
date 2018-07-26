@@ -1138,7 +1138,7 @@ namespace NCE.DataBase
             return size = new FileInfo(filePathDB).Length;
         }
 
-        public void DataBaseSizeСheck(double critSize, out string fileSize, out Color sizeColor)
+        public void СheckDataBaseSize(double critSize, out string fileSize, out Color sizeColor)
         {
             long size = GetDataBaseFileSize();
             string[] suffix = { "B", "KB", "MB", "GB", "TB" };
@@ -1156,7 +1156,7 @@ namespace NCE.DataBase
             else sizeColor = Color.Black;
         }
 
-        public bool DataBaseSizeСheck(double critSize)
+        public bool СheckDataBaseSize(double critSize)
         {
             long size = GetDataBaseFileSize();
             double gb = (double)size / (1024 * 1024 * 1024);
@@ -1200,7 +1200,7 @@ namespace NCE.DataBase
             }
         } 
         
-        public bool CheckEmptyTables()
+        public bool CheckIsTableEmpty()
         {
             try
             {
@@ -1208,7 +1208,7 @@ namespace NCE.DataBase
                 using (SQLiteConnection sqlConn = new SQLiteConnection(connectionDB))
                 using (SQLiteCommand cmd = new SQLiteCommand(sqlConn))
                 {
-                    cmd.CommandText = ("SELECT COUNT(*) from data");
+                    cmd.CommandText = ("SELECT COUNT(*) FROM info");
                     int result = int.Parse(cmd.ExecuteScalar().ToString());
 
                     if (result == 0)
