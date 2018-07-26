@@ -1152,20 +1152,9 @@ namespace NCE.DataBase
         }
 
         /// <summary>
-        /// Возвращает дату создания и модификации файла БД
-        /// </summary>
-        /// <param name="creation">Дата создания</param>
-        /// <param name="modification">Дата модификации</param>
-        public void GetDataBaseFileInfo(out DateTime creation, out DateTime modification)
-        {
-            creation = File.GetCreationTime(filePathDB);
-            modification = File.GetLastWriteTime(filePathDB);            
-        }        
-
-        /// <summary>
         /// Проверяет размер файла БД
         /// </summary>
-        /// <param name="critSize">Допустимый размер БД</param>
+        /// <param name="critSize">Допустимый размер БД в ГБ</param>
         /// <param name="fileSize">Фактический размер БД, в строковом значении</param>
         /// <param name="sizeColor">Цвет по превышению допустимого размера становится красным</param>
         public void СheckDataBaseSize(double critSize, out string fileSize, out Color sizeColor)
@@ -1189,7 +1178,7 @@ namespace NCE.DataBase
         /// <summary>
         /// Проверяет размер файла БД
         /// </summary>
-        /// <param name="critSize">Допустимый размер БД</param>
+        /// <param name="critSize">Допустимый размер БД в ГБ</param>
         /// <returns>Лимит достигнут true</returns>
         public bool СheckDataBaseSize(double critSize)
         {
@@ -1198,6 +1187,17 @@ namespace NCE.DataBase
             if (gb >= critSize) return true;
             else return false;
         }
+
+        /// <summary>
+        /// Возвращает дату создания и модификации файла БД
+        /// </summary>
+        /// <param name="creation">Дата создания</param>
+        /// <param name="modification">Дата модификации</param>
+        public void GetDataBaseFileInfo(out DateTime creation, out DateTime modification)
+        {
+            creation = File.GetCreationTime(filePathDB);
+            modification = File.GetLastWriteTime(filePathDB);            
+        }                
 
         /// <summary>
         /// Архивация файла БД
