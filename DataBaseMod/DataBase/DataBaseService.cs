@@ -39,7 +39,7 @@ namespace NCE.DataBase
         }
 
         /// <summary>
-        /// Создание новой БД
+        /// Создаёт новую БД
         /// </summary>        
         public bool CreateNewDB()
         {
@@ -73,7 +73,7 @@ namespace NCE.DataBase
         }
 
         /// <summary>
-        /// Создание директории для Архива
+        /// Созданёт директорию для Архива
         /// </summary>   
         private bool CreateArchiveDir()
         {
@@ -854,33 +854,6 @@ namespace NCE.DataBase
         }
 
         /// <summary>
-        /// Проверяет налиичие записей в таблице Info
-        /// </summary>
-        /// <returns>true если таблица пустая</returns>
-        public bool CheckIsTableEmpty()
-        {
-            try
-            {
-                OpenConnection();
-                using (SQLiteConnection sqlConn = new SQLiteConnection(connectionDB))
-                using (SQLiteCommand cmd = new SQLiteCommand(sqlConn))
-                {
-                    cmd.CommandText = ("SELECT COUNT(*) FROM info");
-                    int result = int.Parse(cmd.ExecuteScalar().ToString());
-
-                    if (result == 0)
-                        return true;
-                    else
-                        return false;
-                }
-            }
-            finally
-            {
-                CloseConnection();
-            }
-        }
-
-        /// <summary>
         /// Удаляет строку в БД
         /// </summary>
         /// <param name="id">ID строки</param>
@@ -1121,7 +1094,6 @@ namespace NCE.DataBase
         /// <summary>
         /// Возвращает общее количество записей в таблице Info
         /// </summary>
-        /// <returns></returns>
         public int SelectCountFromTable()
         {
             try
@@ -1151,7 +1123,34 @@ namespace NCE.DataBase
                 CloseConnection();
             }            
         }
-        
+
+        /// <summary>
+        /// Проверяет налиичие записей в таблице Info
+        /// </summary>
+        /// <returns>Вернет true если таблица пустая</returns>
+        public bool CheckIsTableEmpty()
+        {
+            try
+            {
+                OpenConnection();
+                using (SQLiteConnection sqlConn = new SQLiteConnection(connectionDB))
+                using (SQLiteCommand cmd = new SQLiteCommand(sqlConn))
+                {
+                    cmd.CommandText = ("SELECT COUNT(*) FROM info");
+                    int result = int.Parse(cmd.ExecuteScalar().ToString());
+
+                    if (result == 0)
+                        return true;
+                    else
+                        return false;
+                }
+            }
+            finally
+            {
+                CloseConnection();
+            }
+        }
+
         /// <summary>
         /// Возвращает дату создания и модификации файла БД
         /// </summary>
